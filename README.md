@@ -2,7 +2,10 @@
 
 Acceda is a modern, enterprise-ready accessibility auditing and remediation platform built with **React 19**, **TypeScript**, **Vite**, and **Tailwind CSS v4**. It leverages AI to classify accessibility findings, generate remediation code, and guide organizations toward WCAG 2.1 AA and Section 508 compliance.
 
-![Dashboard Preview]()
+![Version](https://img.shields.io/badge/version-0.2.0--beta-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
+![TypeScript](https://img.shields.io/badge/typescript-5.x-blue)
+![Build](https://img.shields.io/badge/build-passing-brightgreen)
 
 ## 🚀 Key Features
 
@@ -10,7 +13,7 @@ Acceda is a modern, enterprise-ready accessibility auditing and remediation plat
 - **Findings Explorer**: Advanced table with multi-select, complex filtering (Severity, Source, Status), and keyboard navigation.
 - **Smart Remediation**: Automated Before/After code diffs with step-by-step implementation and verification guides.
 - **VPAT Editor**: Dynamic generation of Voluntary Product Accessibility Templates from audit historical data.
-- **Compliance Wizard**: A 5-step guided experience helping organizations navigate ADA Title II deadlines.
+- **Compliance Wizard**: A 5-step guided `experience helping organizations navigate ADA Title II deadlines.
 - **History & Comparison**: Side-by-side audit comparisons to track compliance progress over time.
 - **Export Engine**: RFC 4180 compliant CSV export and detailed report generation.
 
