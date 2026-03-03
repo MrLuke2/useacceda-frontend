@@ -2,7 +2,7 @@
 
 Acceda is a modern, enterprise-ready accessibility auditing and remediation platform built with **React 19**, **TypeScript**, **Vite**, and **Tailwind CSS v4**. It leverages AI to classify accessibility findings, generate remediation code, and guide organizations toward WCAG 2.1 AA and Section 508 compliance.
 
-![Dashboard Preview](https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6)
+![Dashboard Preview]()
 
 ## 🚀 Key Features
 
