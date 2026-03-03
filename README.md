@@ -1,20 +1,82 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Acceda — AI-Powered Accessibility Auditing
 
-# Run and deploy your AI Studio app
+Acceda is a modern, enterprise-ready accessibility auditing and remediation platform built with **React 19**, **TypeScript**, **Vite**, and **Tailwind CSS v4**. It leverages AI to classify accessibility findings, generate remediation code, and guide organizations toward WCAG 2.1 AA and Section 508 compliance.
 
-This contains everything you need to run your app locally.
+![Dashboard Preview](https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6)
 
-View your app in AI Studio: https://ai.studio/apps/b9a80532-16b9-4909-85b4-0a4c0a91105e
+## 🚀 Key Features
 
-## Run Locally
+- **Automated Scanning**: Integrated `axe-core` based scanning with AI classification for "incomplete" findings.
+- **Findings Explorer**: Advanced table with multi-select, complex filtering (Severity, Source, Status), and keyboard navigation.
+- **Smart Remediation**: Automated Before/After code diffs with step-by-step implementation and verification guides.
+- **VPAT Editor**: Dynamic generation of Voluntary Product Accessibility Templates from audit historical data.
+- **Compliance Wizard**: A 5-step guided experience helping organizations navigate ADA Title II deadlines.
+- **History & Comparison**: Side-by-side audit comparisons to track compliance progress over time.
+- **Export Engine**: RFC 4180 compliant CSV export and detailed report generation.
 
-**Prerequisites:**  Node.js
+## 🛠️ Tech Stack
 
+- **Framework**: [React 19](https://react.dev/)
+- **Build Tool**: [Vite 6](https://vitejs.dev/)
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
+- **State Management**: [Zustand](https://github.com/pmndrs/zustand) (integrated in hooks)
+- **Icons**: [Lucide React](https://lucide.dev/)
+- **UI Components**: Radix UI primitives & custom design system
+- **Type Safety**: TypeScript (Strict Mode + `noUncheckedIndexedAccess`)
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## 📦 Getting Started
+
+### Prerequisites
+
+- [Node.js](https://nodejs.org/) (v18+)
+- [npm](https://www.npmjs.com/) (v9+)
+
+### Installation
+
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/MrLuke2/useacceda-frontend.git
+   cd acceda-frontend
+   ```
+
+2. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+3. Run the development server:
+   ```bash
+   npm run dev
+   ```
+
+The app will be available at `http://localhost:5173`.
+
+## 🏗️ Project Structure
+
+```text
+src/
+├── components/         # Atomic UI & feature-specific components
+│   ├── ui/             # Radix-based design system primitives
+│   └── findings/       # Tables, filters, and finding-specific UI
+├── hooks/              # Custom React hooks (filtering logic, store connectivity)
+├── layouts/            # Dashboard and shared layout structures
+├── lib/                # Core logic, constants, and mock data
+├── pages/              # Main view components (Dashboard, Explorer, etc.)
+└── App.tsx             # Routing and theme providers
+```
+
+## 🔨 Development Tools
+
+- **Linting & Types**: `npm run lint` (runs `tsc --noEmit` and ESLint)
+- **Formatting**: Uses default project configuration for clean coding standards.
+- **Aliases**: Global path alias `@/` points to the `src/` directory.
+
+## 📝 License
+
+Distributed under the MIT License. See `LICENSE` for more information.
+
+---
+
+<p align="center">Built for the future of digital accessibility.</p>
