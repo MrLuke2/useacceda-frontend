@@ -30,7 +30,8 @@ import {
 } from "@/components/ui/tooltip"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useToast } from "@/components/ui/toast"
-import { mockGateResult, Severity } from "@/lib/mock-data"
+import { Severity } from "@/lib/mock-data"
+import { useGateStore, GateFinding } from "@/store/useGateStore"
 import { cn } from "@/lib/utils"
 
 const SEVERITY_COLORS: Record<Severity, string> = {
@@ -44,22 +45,25 @@ export function CiCdGate() {
   const { id } = useParams()
   const navigate = useNavigate()
   const { toast } = useToast()
-  const data = mockGateResult
+  const { gateResults, isLoading, fetchGateResult } = useGateStore()
+  const data = id ? gateResults[id] : null
   const [isConfigOpen, setIsConfigOpen] = React.useState(false)
   const [isConfigured, setIsConfigured] = React.useState(true) // Added for empty state demo
   
-  const [isLoading, setIsLoading] = React.useState(true)
   React.useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 1000)
-    return () => clearTimeout(timer)
-  }, [])
+    if (id) {
+      fetchGateResult(id)
+    }
+  }, [id, fetchGateResult])
 
   const handleCopyConfig = () => {
-    navigator.clipboard.writeText(JSON.stringify(data.config, null, 2))
-    toast("Configuration copied to clipboard", "success")
+    if (data) {
+      navigator.clipboard.writeText(JSON.stringify(data.config, null, 2))
+      toast("Configuration copied to clipboard", "success")
+    }
   }
 
-  if (isLoading) {
+  if (isLoading || !data) {
     return (
       <div className="space-y-8">
         <Card className="overflow-hidden border-0 shadow-sm">
@@ -205,7 +209,7 @@ export function CiCdGate() {
             Failure Reasons
           </h2>
           <div className="grid gap-3 sm:grid-cols-2">
-            {data.failureReasons.map((reason, i) => (
+            {data.failureReasons.map((reason: string, i: number) => (
               <div
                 key={i}
                 className="flex items-start gap-3 rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-destructive"
@@ -250,7 +254,7 @@ export function CiCdGate() {
                   </TableRow>
                 ) : (
                   <TooltipProvider delayDuration={300}>
-                    {data.newBlockingViolations.map((finding) => (
+                    {data.newBlockingViolations.map((finding: GateFinding) => (
                       <TableRow
                         key={finding.id}
                         className="cursor-pointer transition-colors hover:bg-muted/50"
@@ -317,7 +321,7 @@ export function CiCdGate() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  data.regressions.map((finding) => (
+                  data.regressions.map((finding: GateFinding) => (
                     <TableRow
                       key={finding.id}
                       className="cursor-pointer transition-colors hover:bg-muted/50"

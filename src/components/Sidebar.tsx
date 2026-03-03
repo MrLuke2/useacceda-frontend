@@ -21,7 +21,9 @@ import {
 import { cn } from "@/lib/utils"
 import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
-import { mockFindings, mockDocuments, mockRemediations } from "@/lib/mock-data"
+import { useFindingStore } from "@/store/useFindingStore"
+import { useDocumentStore } from "@/store/useDocumentStore"
+import { useRemediationStore } from "@/store/useRemediationStore"
 
 interface SidebarProps {
   isCollapsed: boolean
@@ -37,11 +39,21 @@ export function Sidebar({ isCollapsed, setIsCollapsed, isMobile, onClose }: Side
   const auditId = auditIdMatch ? auditIdMatch[1] : "v2.4.1"
   const navRef = React.useRef<HTMLDivElement>(null)
 
+  const { findings, fetchFindings } = useFindingStore()
+  const { documents, fetchDocuments } = useDocumentStore()
+  const { remediations, fetchRemediations } = useRemediationStore()
+
+  React.useEffect(() => {
+    if (findings.length === 0) fetchFindings()
+    if (documents.length === 0) fetchDocuments()
+    if (remediations.length === 0) fetchRemediations()
+  }, []) // Initial load only
+
   // Dynamic Counts
-  const humanReviewCount = mockFindings.filter(f => f.status === "RequiresHumanReview").length
-  const processingDocsCount = mockDocuments.filter(d => d.status === "Processing").length
-  const totalFindingsCount = mockFindings.length
-  const remediationCount = mockRemediations.length
+  const humanReviewCount = findings.filter(f => f.status === "RequiresHumanReview").length
+  const processingDocsCount = documents.filter(d => d.status === "Processing").length
+  const totalFindingsCount = findings.length
+  const remediationCount = remediations.length
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (!navRef.current) return

@@ -39,7 +39,8 @@ import {
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu"
 import { Skeleton } from "@/components/ui/skeleton"
-import { mockDocuments, DocumentEntry } from "@/lib/mock-data"
+import { DocumentEntry } from "@/lib/mock-data"
+import { useDocumentStore } from "@/store/useDocumentStore"
 import { cn } from "@/lib/utils"
 
 function ComplianceScoreGauge({ score, size = 32 }: { score: number; size?: number }) {
@@ -86,19 +87,18 @@ function ComplianceScoreGauge({ score, size = 32 }: { score: number; size?: numb
 
 export function Documents() {
   const navigate = useNavigate()
-  const [documents, setDocuments] = React.useState<DocumentEntry[]>(mockDocuments)
+  const { documents, isLoading, fetchDocuments, addDocument, deleteDocument, updateDocumentStatus } = useDocumentStore()
+  
   const [searchQuery, setSearchQuery] = React.useState("")
   const [activeTab, setActiveTab] = React.useState("all")
   const [isUploadModalOpen, setIsUploadModalOpen] = React.useState(false)
   const [isDragging, setIsDragging] = React.useState(false)
   const [sortField, setSortField] = React.useState<keyof DocumentEntry>("uploadedAt")
   const [sortDirection, setSortDirection] = React.useState<"asc" | "desc">("desc")
-  const [isLoading, setIsLoading] = React.useState(true)
 
   React.useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 1000)
-    return () => clearTimeout(timer)
-  }, [])
+    fetchDocuments()
+  }, [fetchDocuments])
 
   const filteredDocuments = React.useMemo(() => {
     return documents.filter(doc => {
@@ -139,23 +139,13 @@ export function Documents() {
       fileSize: "1.2 MB"
     }
 
-    setDocuments(prev => [newDoc, ...prev])
+    addDocument(newDoc)
     setIsUploadModalOpen(false)
 
     // Simulate processing
     setTimeout(() => {
-      setDocuments(prev => prev.map(doc => {
-        if (doc.id === newDoc.id) {
-          return {
-            ...doc,
-            status: "Scanned",
-            findingsCount: Math.floor(Math.random() * 20) + 5,
-            aiRemediatedCount: Math.floor(Math.random() * 10) + 2,
-            complianceScore: Math.floor(Math.random() * 30) + 70
-          }
-        }
-        return doc
-      }))
+      updateDocumentStatus(newDoc.id, "Scanned")
+      // In a real app we'd trigger a more complex update but for now this works with the store
     }, 2000)
   }
 
@@ -339,7 +329,7 @@ export function Documents() {
                             <DropdownMenuItem>
                               <Scan className="mr-2 h-4 w-4" /> Rescan
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="text-destructive">
+                             <DropdownMenuItem className="text-destructive" onClick={() => deleteDocument(doc.id)}>
                               <Trash2 className="mr-2 h-4 w-4" /> Delete
                             </DropdownMenuItem>
                           </DropdownMenuContent>

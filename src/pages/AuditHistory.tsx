@@ -30,7 +30,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Skeleton } from "@/components/ui/skeleton"
-import { mockAuditHistory, AuditHistoryEntry, AuditTrigger, AuditStatus } from "@/lib/mock-data"
+import { AuditHistoryEntry, AuditTrigger, AuditStatus } from "@/lib/mock-data"
+import { useAuditStore } from "@/store/useAuditStore"
 import { cn } from "@/lib/utils"
 
 type SortField = keyof AuditHistoryEntry | ""
@@ -41,11 +42,11 @@ import { FindingsPagination } from "@/components/findings/FindingsPagination"
 export function AuditHistory() {
   const navigate = useNavigate()
   
-  const [isLoading, setIsLoading] = React.useState(true)
+  const { audits, isLoading, fetchAudits } = useAuditStore()
+  
   React.useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 1000)
-    return () => clearTimeout(timer)
-  }, [])
+    fetchAudits()
+  }, [fetchAudits])
 
   const [searchQuery, setSearchQuery] = React.useState("")
   const [triggerFilter, setTriggerFilter] = React.useState<AuditTrigger | "All">("All")
@@ -69,7 +70,7 @@ export function AuditHistory() {
   }
 
   const filteredAndSorted = React.useMemo(() => {
-    let result = [...mockAuditHistory]
+    let result = [...audits]
     
     if (searchQuery) {
       const query = searchQuery.toLowerCase()
@@ -139,8 +140,8 @@ export function AuditHistory() {
   const comparisonData = React.useMemo(() => {
     if (selectedAudits.size !== 2) return null
     const [id1, id2] = Array.from(selectedAudits)
-    const audit1 = mockAuditHistory.find(a => a.id === id1)
-    const audit2 = mockAuditHistory.find(a => a.id === id2)
+    const audit1 = audits.find((a: AuditHistoryEntry) => a.id === id1)
+    const audit2 = audits.find((a: AuditHistoryEntry) => a.id === id2)
     if (!audit1 || !audit2) return null
     
     // Sort by timestamp to ensure chronological comparison
@@ -196,7 +197,7 @@ export function AuditHistory() {
     )
   }
 
-  if (mockAuditHistory.length === 0) {
+  if (audits.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-6 text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
         <div className="flex h-32 w-32 items-center justify-center rounded-full bg-muted/50">

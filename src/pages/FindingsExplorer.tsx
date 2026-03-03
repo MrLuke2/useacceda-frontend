@@ -10,7 +10,8 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useToast } from "@/components/ui/toast"
-import { mockFindings, Finding } from "@/lib/mock-data"
+import { Finding } from "@/lib/mock-data"
+import { useFindingStore } from "@/store/useFindingStore"
 import { exportFindingsCSV } from "@/lib/export-csv"
 import { useFindingsFilters } from "@/hooks/useFindingsFilters"
 import { FindingsFilterBar } from "@/components/findings/FindingsFilterBar"
@@ -24,11 +25,11 @@ export function FindingsExplorer() {
   const navigate = useNavigate()
   const { toast } = useToast()
   
-  const [isLoading, setIsLoading] = React.useState(true)
+  const { findings, isLoading, fetchFindings } = useFindingStore()
+
   React.useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 1500)
-    return () => clearTimeout(timer)
-  }, [])
+    fetchFindings()
+  }, [fetchFindings])
 
   const {
     searchQuery, setSearchQuery,
@@ -45,7 +46,7 @@ export function FindingsExplorer() {
     selectedRows, toggleSelectAll, toggleSelectRow,
     focusedRowIndex, handleTableKeyDown,
     uniqueWcag, uniquePageUrls,
-  } = useFindingsFilters({ findings: mockFindings })
+  } = useFindingsFilters({ findings })
 
   const handleExport = (findingsToExport: Finding[]) => {
     exportFindingsCSV(findingsToExport, id || "unknown")
@@ -102,7 +103,7 @@ export function FindingsExplorer() {
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Findings Explorer</h1>
           <p className="text-sm text-muted-foreground" role="status">
-            Showing {filteredFindings.length} of {mockFindings.length} findings
+            Showing {filteredFindings.length} of {findings.length} findings
           </p>
         </div>
         <div className="flex items-center gap-2">

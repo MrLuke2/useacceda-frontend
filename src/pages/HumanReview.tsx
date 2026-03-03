@@ -36,7 +36,8 @@ import { useFindingsFilters } from "@/hooks/useFindingsFilters"
 import { FindingsFilterBar } from "@/components/findings/FindingsFilterBar"
 import { FindingsTable } from "@/components/findings/FindingsTable"
 import { FindingsPagination } from "@/components/findings/FindingsPagination"
-import { mockFindings, Finding, FindingStatus, Severity } from "@/lib/mock-data"
+import { Finding, FindingStatus, Severity } from "@/lib/mock-data"
+import { useFindingStore } from "@/store/useFindingStore"
 import { cn } from "@/lib/utils"
 import { useToast } from "@/components/ui/toast"
 import { STATUS_CONFIG, SEVERITY_COLORS } from "@/lib/finding-constants"
@@ -203,13 +204,12 @@ export function HumanReview() {
   const [htmlSource, setHtmlSource] = React.useState(MOCK_DOCUMENT_HTML)
   const [isEditingHtml, setIsEditingHtml] = React.useState(false)
   const [zoomLevel, setZoomLevel] = React.useState(100)
-  const [isLoading, setIsLoading] = React.useState(true)
   const { toast } = useToast()
+  const { findings, isLoading, fetchFindings, updateFindingStatus } = useFindingStore()
 
   React.useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 1000)
-    return () => clearTimeout(timer)
-  }, [])
+    fetchFindings()
+  }, [fetchFindings])
 
   const isModified = htmlSource !== MOCK_DOCUMENT_HTML
 
@@ -220,8 +220,8 @@ export function HumanReview() {
 
   // Filter findings for the queue
   const queueFindings = React.useMemo(() => {
-    return mockFindings.filter(f => f.status === "RequiresHumanReview" || (f.confidence && f.confidence < 0.7))
-  }, [])
+    return findings.filter(f => f.status === "RequiresHumanReview" || (f.confidence && f.confidence < 0.7))
+  }, [findings])
 
   // Use the hook for the queue mode
   const {
@@ -277,7 +277,10 @@ export function HumanReview() {
   }
 
   const handleSubmitReview = () => {
-    toast(`Review Submitted: Finding ${selectedFinding?.id} has been updated.`, "success")
+    if (selectedFinding && classification) {
+      updateFindingStatus(selectedFinding.id, classification as FindingStatus)
+      toast(`Review Submitted: Finding ${selectedFinding.id} has been updated.`, "success")
+    }
     
     // Find current index
     const currentIndex = queueFindings.findIndex(f => f.id === selectedFinding?.id)

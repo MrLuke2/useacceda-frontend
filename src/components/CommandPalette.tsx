@@ -13,7 +13,8 @@ import {
   Settings
 } from "lucide-react"
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
-import { mockAuditHistory, mockDocuments } from "@/lib/mock-data"
+import { mockDocuments } from "@/lib/mock-data"
+import { useAuditStore } from "@/store/useAuditStore"
 import { cn } from "@/lib/utils"
 
 interface CommandItem {
@@ -53,13 +54,15 @@ export function CommandPalette({
     { id: "act-export", title: "Export VPAT", icon: Download, category: "Action", action: () => navigate("/vpat") },
   ], [navigate])
 
-  const audits = React.useMemo<CommandItem[]>(() => mockAuditHistory.slice(0, 5).map(audit => ({
+  const storeAudits = useAuditStore(state => state.audits)
+
+  const audits = React.useMemo<CommandItem[]>(() => storeAudits.slice(0, 5).map(audit => ({
     id: `audit-${audit.id}`,
     title: `Audit ${audit.id}`,
     icon: History,
     category: "Audit",
     action: () => navigate(`/audit/${audit.id}`)
-  })), [navigate])
+  })), [navigate, storeAudits])
 
   const docs = React.useMemo<CommandItem[]>(() => mockDocuments.slice(0, 5).map(doc => ({
     id: `doc-${doc.id}`,

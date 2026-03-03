@@ -10,11 +10,14 @@ import { Slider } from "@/components/ui/slider"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/components/ui/toast"
+import { AuditHistoryEntry } from "@/lib/mock-data"
+import { useAuditStore } from "@/store/useAuditStore"
 import { cn } from "@/lib/utils"
 
 export function NewAudit() {
   const navigate = useNavigate()
   const { toast } = useToast()
+  const { addAudit } = useAuditStore()
   const [url, setUrl] = React.useState("")
   const [isValidUrl, setIsValidUrl] = React.useState<boolean | null>(null)
   const [confidence, setConfidence] = React.useState([0.75])
@@ -46,6 +49,20 @@ export function NewAudit() {
     if (isLoading && currentStage < STAGES.length) {
       const timer = setTimeout(() => {
         if (currentStage === STAGES.length - 1) {
+          // Add to store
+          const newAudit: AuditHistoryEntry = {
+            id: `v2.4.${Math.floor(Math.random() * 100)}`,
+            rootUrl: isDocumentMode ? uploadedFile || "Document" : url,
+            trigger: "Manual",
+            status: "Complete",
+            pagesScanned: isDocumentMode ? 124 : 847,
+            violationsFound: isDocumentMode ? 99 : 1204,
+            aiClassificationRate: 89,
+            duration: "00:04:12",
+            timestamp: new Date().toISOString().replace('T', ' ').substring(0, 16),
+            gateStatus: "Pass"
+          }
+          addAudit(newAudit)
           navigate("/audit/v2.4.1")
         } else {
           setCurrentStage(prev => prev + 1)
@@ -53,7 +70,7 @@ export function NewAudit() {
       }, 800)
       return () => clearTimeout(timer)
     }
-  }, [isLoading, currentStage, navigate])
+  }, [isLoading, currentStage, navigate, addAudit, isDocumentMode, url, uploadedFile, STAGES.length])
 
   const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value

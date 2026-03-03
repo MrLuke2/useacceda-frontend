@@ -26,7 +26,8 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion"
 import { Skeleton } from "@/components/ui/skeleton"
-import { mockRemediations, Severity, EffortLevel } from "@/lib/mock-data"
+import { Severity, EffortLevel } from "@/lib/mock-data"
+import { useRemediationStore } from "@/store/useRemediationStore"
 import { cn } from "@/lib/utils"
 
 const SEVERITY_COLORS: Record<Severity, string> = {
@@ -54,11 +55,11 @@ type SortOption = "Most Critical First" | "Lowest Effort First" | "Most Findings
 export function RemediationPanel() {
   const { id: _id } = useParams()
   
-  const [isLoading, setIsLoading] = React.useState(true)
+  const { remediations, isLoading, fetchRemediations } = useRemediationStore()
+  
   React.useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 1000)
-    return () => clearTimeout(timer)
-  }, [])
+    fetchRemediations()
+  }, [fetchRemediations])
 
   const [effortFilter, setEffortFilter] = React.useState<EffortLevel | "All">("All")
   const [severityFilter, setSeverityFilter] = React.useState<Severity | "All">("All")
@@ -66,14 +67,14 @@ export function RemediationPanel() {
 
   const effortCounts = React.useMemo(() => {
     const counts = { Low: 0, Medium: 0, High: 0 }
-    mockRemediations.forEach((r) => {
+    remediations.forEach((r) => {
       counts[r.effort]++
     })
     return counts
-  }, [])
+  }, [remediations])
 
   const filteredAndSorted = React.useMemo(() => {
-    let result = [...mockRemediations]
+    let result = [...remediations]
     
     if (effortFilter !== "All") {
       result = result.filter((r) => r.effort === effortFilter)
@@ -104,7 +105,7 @@ export function RemediationPanel() {
     })
 
     return result
-  }, [effortFilter, severityFilter, sortOption])
+  }, [remediations, effortFilter, severityFilter, sortOption])
 
   if (isLoading) {
     return (

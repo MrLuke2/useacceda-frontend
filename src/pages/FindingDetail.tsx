@@ -1,3 +1,4 @@
+import * as React from "react"
 import { useParams, useNavigate, Link } from "react-router-dom"
 import {
   ArrowLeft,
@@ -31,7 +32,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { mockFindingDetails } from "@/lib/mock-data"
+import { Skeleton } from "@/components/ui/skeleton"
+import { useFindingStore } from "@/store/useFindingStore"
 import { cn } from "@/lib/utils"
 import { STATUS_CONFIG, SEVERITY_COLORS, STATUS_BORDER_COLORS } from "@/lib/finding-constants"
 
@@ -80,7 +82,34 @@ function ConfidenceGauge({ value }: { value: number }) {
 export function FindingDetail() {
   const { id, fid } = useParams()
   const navigate = useNavigate()
-  const finding = (mockFindingDetails[fid ?? ""] ?? mockFindingDetails["fid-1000"])!
+  const { findingDetails, isLoading, fetchFindingDetail } = useFindingStore()
+
+  React.useEffect(() => {
+    if (fid) {
+      fetchFindingDetail(fid)
+    }
+  }, [fid, fetchFindingDetail])
+
+  const finding = fid ? findingDetails[fid] : null
+
+  if (isLoading || !finding) {
+    return (
+      <div className="flex flex-col gap-6 p-6 max-w-7xl mx-auto">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Skeleton className="h-8 w-32" />
+        </div>
+        <Card className="h-32">
+          <CardContent className="p-6">
+            <Skeleton className="h-full w-full" />
+          </CardContent>
+        </Card>
+        <Skeleton className="h-12 w-full" />
+        <div className="space-y-4">
+          <Skeleton className="h-64 w-full" />
+        </div>
+      </div>
+    )
+  }
 
   const status = STATUS_CONFIG[finding.status]
 

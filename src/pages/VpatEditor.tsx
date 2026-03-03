@@ -36,7 +36,8 @@ import {
   TableRow 
 } from "@/components/ui/table"
 import { Checkbox } from "@/components/ui/checkbox"
-import { mockAuditData, mockAuditHistory } from "@/lib/mock-data"
+import { mockAuditData, AuditHistoryEntry } from "@/lib/mock-data"
+import { useAuditStore } from "@/store/useAuditStore"
 import { cn } from "@/lib/utils"
 import { useToast } from "@/components/ui/toast"
 
@@ -133,6 +134,7 @@ function ConformanceSelect({
 export function VpatEditor() {
   const { toast } = useToast()
   const [isLoading, setIsLoading] = React.useState(true)
+  const audits = useAuditStore(state => state.audits)
 
   React.useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 1500)
@@ -292,7 +294,7 @@ export function VpatEditor() {
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Recent Audits</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              {mockAuditHistory.filter(a => a.status === "Complete").slice(0, 5).map(audit => (
+              {audits.filter(a => a.status === "Complete").slice(0, 5).map((audit: AuditHistoryEntry) => (
                 <DropdownMenuItem 
                   key={audit.id} 
                   onClick={() => toast(`VPAT data refreshed from Audit ${audit.id}`, "success")}

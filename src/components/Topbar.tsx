@@ -22,7 +22,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { mockAlerts, Alert } from "@/lib/mock-data"
+import { useAlertStore } from "@/store/useAlertStore"
 import { cn } from "@/lib/utils"
 
 const BREADCRUMB_MAP: Record<string, string> = {
@@ -46,13 +46,9 @@ export function Topbar({
 }) {
   const { theme, setTheme } = useTheme()
   const location = useLocation()
-  const [alerts, setAlerts] = React.useState<Alert[]>(mockAlerts)
+  const { alerts, markAllAsRead } = useAlertStore()
 
   const unreadCount = alerts.filter(a => !a.read).length
-
-  const markAllRead = () => {
-    setAlerts(prev => prev.map(a => ({ ...a, read: true })))
-  }
 
   const pathSegments = location.pathname.split("/").filter(Boolean)
   
@@ -163,7 +159,7 @@ export function Topbar({
               </div>
               {unreadCount > 0 && (
                 <button 
-                  onClick={(e) => { e.preventDefault(); markAllRead(); }}
+                  onClick={(e) => { e.preventDefault(); markAllAsRead(); }}
                   className="text-xs text-primary hover:underline"
                 >
                   Mark all read

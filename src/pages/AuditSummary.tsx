@@ -32,7 +32,7 @@ import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Skeleton } from "@/components/ui/skeleton"
-import { mockAuditData } from "@/lib/mock-data"
+import { useAuditDetailsStore } from "@/store/useAuditDetailsStore"
 import { cn } from "@/lib/utils"
 
 import { FindingsPagination } from "@/components/findings/FindingsPagination"
@@ -40,19 +40,20 @@ import { FindingsPagination } from "@/components/findings/FindingsPagination"
 export function AuditSummary() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const data = mockAuditData
-  const [isLoading, setIsLoading] = React.useState(true)
+  const { auditDetails, isLoading, fetchAuditDetails } = useAuditDetailsStore()
+  const data = id ? auditDetails[id] : null
 
   React.useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 1500)
-    return () => clearTimeout(timer)
-  }, [])
+    if (id) {
+      fetchAuditDetails(id)
+    }
+  }, [id, fetchAuditDetails])
 
   const [currentPage, setCurrentPage] = React.useState(1)
   const [focusedRowIndex, setFocusedRowIndex] = React.useState<number>(-1)
   const rowsPerPage = 10
-  const totalPages = Math.ceil(data.pages.length / rowsPerPage)
-  const paginatedPages = data.pages.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
+  const totalPages = data ? Math.ceil(data.pages.length / rowsPerPage) : 0
+  const paginatedPages = data ? data.pages.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage) : []
 
   const handleTableKeyDown = (e: React.KeyboardEvent) => {
     if (paginatedPages.length === 0) return
@@ -70,7 +71,7 @@ export function AuditSummary() {
     }
   }
 
-  if (isLoading) {
+  if (isLoading || !data) {
     return (
       <div className="space-y-8">
         <div className="flex flex-col gap-4 rounded-xl border bg-card p-6 shadow-sm sm:flex-row sm:items-center sm:justify-between">
