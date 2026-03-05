@@ -135,27 +135,26 @@ function validateUrl(value: string): boolean {
 
 /** Step progress indicator integrated into the card header area */
 function StepProgress({ currentStep }: { currentStep: number }) {
+  const progress = Math.max(0, (currentStep - 1) / (STEPS.length - 1))
+
   return (
-    <div className="relative flex items-center justify-between px-2 w-full">
-      {/* Background Line */}
-      <div className="absolute top-[1.125rem] left-[2.5rem] right-[2.5rem] h-0.5 bg-muted-foreground/20 z-0" />
-      
-      {/* Active Line */}
-      <div 
-        className="absolute top-[1.125rem] left-[2.5rem] h-0.5 bg-primary transition-all duration-500 z-0" 
-        style={{ 
-          width: `${Math.max(0, (currentStep - 1) / (STEPS.length - 1) * 100)}%`,
-          maxWidth: 'calc(100% - 5rem)'
-        }} 
+    <div className="relative flex w-full">
+      {/* Background track — spans center of first step to center of last step (10%–90% for 5 equal items) */}
+      <div className="pointer-events-none absolute top-[1.125rem] h-0.5 bg-muted-foreground/20" style={{ left: '10%', right: '10%' }} />
+      {/* Active track */}
+      <div
+        className="pointer-events-none absolute top-[1.125rem] h-0.5 bg-primary transition-all duration-500"
+        style={{ left: '10%', width: `calc(80% * ${progress})` }}
       />
 
+      {/* Step nodes — each takes equal 1/5 of the row so circles align with track */}
       {STEPS.map((step) => {
         const isComplete = currentStep > step.id
         const isCurrent = currentStep === step.id
         const StepIcon = step.icon
 
         return (
-          <div key={step.id} className="flex flex-col items-center gap-2 relative z-10">
+          <div key={step.id} className="relative z-10 flex flex-1 flex-col items-center gap-2">
             <div
               className={cn(
                 "flex h-9 w-9 items-center justify-center rounded-full border-2 transition-all duration-300 bg-background shadow-sm",
@@ -173,7 +172,7 @@ function StepProgress({ currentStep }: { currentStep: number }) {
             </div>
             <span
               className={cn(
-                "text-[10px] font-bold tracking-wide whitespace-nowrap",
+                "text-[10px] font-bold tracking-wide text-center whitespace-nowrap",
                 isCurrent ? "text-primary" : isComplete ? "text-foreground" : "text-muted-foreground"
               )}
             >
@@ -747,16 +746,16 @@ function Step5({ data, onComplete: _onComplete }: { data: WizardData; onComplete
 
         {/* Actions */}
         <div className="flex flex-col gap-3">
-          <Button className="w-full h-11" onClick={() => navigate("/audit/v2.4.1")}>
+          <Button className="w-full h-11" onClick={() => navigate("/login", { state: { from: "/audit/v2.4.1" } })}>
             <BarChart3 className="mr-2 h-4 w-4" />
             View Full Dashboard
           </Button>
           <div className="grid grid-cols-2 gap-3">
-            <Button variant="outline" className="h-10">
+            <Button variant="outline" className="h-10" onClick={() => navigate("/login", { state: { from: "/audit/v2.4.1", action: "download" } })}>
               <Download className="mr-2 h-4 w-4" />
               Download Report
             </Button>
-            <Button variant="outline" className="h-10">
+            <Button variant="outline" className="h-10" onClick={() => navigate("/login", { state: { from: "/vpat" } })}>
               <ExternalLink className="mr-2 h-4 w-4" />
               Export VPAT
             </Button>
@@ -776,6 +775,7 @@ function Step5({ data, onComplete: _onComplete }: { data: WizardData; onComplete
           <Button
             variant="secondary"
             className="bg-violet-600 text-white hover:bg-violet-700 dark:bg-violet-600 dark:hover:bg-violet-700"
+            onClick={() => navigate("/login", { state: { from: "/audit/v2.4.1/remediation" } })}
           >
             <FileText className="mr-2 h-4 w-4" />
             Start Document Remediation
@@ -909,7 +909,7 @@ export function StartHere() {
   const isExecuting = step === 5
 
   return (
-    <div className="relative min-h-screen w-full flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-950 overflow-x-hidden p-4 md:p-8">
+    <div className="relative min-h-screen w-full flex flex-col items-center justify-center bg-white dark:bg-black overflow-x-hidden p-4 md:p-8">
       {/* Background Accents - Immersive Atmosphere */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-primary/10 blur-[120px] animate-pulse" />

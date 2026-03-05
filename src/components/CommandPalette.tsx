@@ -9,8 +9,7 @@ import {
   FileSpreadsheet, 
   UploadCloud, 
   Download, 
-  Play, 
-  Settings
+  Play
 } from "lucide-react"
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
 import { mockDocuments } from "@/lib/mock-data"
@@ -45,7 +44,6 @@ export function CommandPalette({
     { id: "page-history", title: "Audit History", icon: History, category: "Page", action: () => navigate("/audits") },
     { id: "page-review", title: "Human Review", icon: UserCheck, category: "Page", action: () => navigate("/review") },
     { id: "page-vpat", title: "VPAT Editor", icon: FileSpreadsheet, category: "Page", action: () => navigate("/vpat") },
-    { id: "page-settings", title: "Settings", icon: Settings, category: "Page", action: () => navigate("/settings") },
   ], [navigate])
 
   const staticActions = React.useMemo<CommandItem[]>(() => [

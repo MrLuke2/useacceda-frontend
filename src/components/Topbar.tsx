@@ -35,6 +35,7 @@ const BREADCRUMB_MAP: Record<string, string> = {
   "review": "Human Review",
   "vpat": "VPAT Editor",
   "audits": "Audit History",
+  "new-audit": "New Audit",
 }
 
 export function Topbar({ 
@@ -66,26 +67,33 @@ export function Topbar({
             <BreadcrumbList>
               <BreadcrumbItem>
                 <BreadcrumbLink asChild>
-                  <Link to="/">Home</Link>
+                  <Link to="/new-audit">Home</Link>
                 </BreadcrumbLink>
               </BreadcrumbItem>
               {pathSegments.length > 0 && <BreadcrumbSeparator />}
               {pathSegments.map((segment, index) => {
                 const isLast = index === pathSegments.length - 1
-                const path = `/${pathSegments.slice(0, index + 1).join("/")}`
+                let path = `/${pathSegments.slice(0, index + 1).join("/")}`
                 
+                // Handle specific redirections as requested by the user
+                if (segment.toLowerCase() === "audit" && !isLast) {
+                  path = "/audits"
+                }
+
                 let label = BREADCRUMB_MAP[segment.toLowerCase()]
                 if (!label) {
                   // Check if it looks like an ID (e.g., v2.4.1, doc-1)
                   if (/^v\d+\.\d+\.\d+$/.test(segment) || /^doc-\d+$/.test(segment) || /^aud-/.test(segment)) {
                      label = segment
+                     // If it's an ID, ensure path is /audit/:id even if nested
+                     path = `/audit/${segment}`
                   } else {
                      label = segment.charAt(0).toUpperCase() + segment.slice(1)
                   }
                 }
 
                 return (
-                  <React.Fragment key={path}>
+                  <React.Fragment key={`${path}-${index}`}>
                     <BreadcrumbItem>
                       {isLast ? (
                         <BreadcrumbPage className={cn(label === segment && "font-mono")}>{label}</BreadcrumbPage>
@@ -226,7 +234,7 @@ export function Topbar({
             <DropdownMenuItem>Profile</DropdownMenuItem>
             <DropdownMenuItem>Settings</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Log out</DropdownMenuItem>
+            <DropdownMenuItem>Log Out</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

@@ -18,6 +18,7 @@ import { FindingDetail } from "@/pages/FindingDetail"
 import { Documents } from "@/pages/Documents"
 import { HumanReview } from "@/pages/HumanReview"
 import { VpatEditor } from "@/pages/VpatEditor"
+import LoginPage from "@/pages/Login"
 
 export default function App() {
   return (
@@ -26,6 +27,7 @@ export default function App() {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<StartHere />} />
+            <Route path="/login" element={<LoginPage />} />
             <Route element={<DashboardLayout />}>
               <Route path="new-audit" element={<NewAudit />} />
               <Route path="audits" element={<AuditHistory />} />
@@ -33,7 +35,6 @@ export default function App() {
               <Route path="review" element={<HumanReview />} />
               <Route path="vpat" element={<VpatEditor />} />
               <Route path="docs" element={<div className="p-8 text-center text-muted-foreground">Documentation (Coming Soon)</div>} />
-              <Route path="settings" element={<div className="p-8 text-center text-muted-foreground">Settings (Coming Soon)</div>} />
               
               <Route path="audit/:id" element={<AuditSummary />} />
               <Route path="audit/:id/finding/:fid" element={<FindingDetail />} />

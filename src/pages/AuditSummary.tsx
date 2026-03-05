@@ -1,5 +1,5 @@
 import * as React from "react"
-import { useParams, Link, useNavigate } from "react-router-dom"
+import { useParams, Link, useNavigate, useLocation } from "react-router-dom"
 import {
   FileText,
   AlertTriangle,
@@ -21,8 +21,6 @@ import {
   Cell,
   Pie,
   PieChart,
-  ResponsiveContainer,
-  Tooltip as RechartsTooltip,
   XAxis,
   YAxis,
 } from "recharts"
@@ -32,16 +30,64 @@ import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Skeleton } from "@/components/ui/skeleton"
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  type ChartConfig,
+} from "@/components/ui/chart"
+import { useToast } from "@/components/ui/toast"
 import { useAuditDetailsStore } from "@/store/useAuditDetailsStore"
 import { cn } from "@/lib/utils"
 
 import { FindingsPagination } from "@/components/findings/FindingsPagination"
 
+const severityConfig = {
+  value: {
+    label: "Violations",
+  },
+  Critical: {
+    label: "Critical",
+    color: "hsl(var(--destructive))",
+  },
+  Serious: {
+    label: "Serious",
+    color: "#EA580C",
+  },
+  Moderate: {
+    label: "Moderate",
+    color: "#F59E0B",
+  },
+  Minor: {
+    label: "Minor",
+    color: "hsl(var(--muted-foreground))",
+  },
+} satisfies ChartConfig
+
+const lighthouseConfig = {
+  count: {
+    label: "Pages",
+    color: "hsl(var(--primary))",
+  },
+} satisfies ChartConfig
+
 export function AuditSummary() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const location = useLocation()
+  const { toast } = useToast()
   const { auditDetails, isLoading, fetchAuditDetails } = useAuditDetailsStore()
   const data = id ? auditDetails[id] : null
+
+  const hasTriggeredDownload = React.useRef(false)
+
+  React.useEffect(() => {
+    if ((location.state as any)?.action === "download" && !hasTriggeredDownload.current) {
+      hasTriggeredDownload.current = true
+      toast("Preparing your audit report download...", "success")
+      // In a real app, you'd trigger the file download here
+    }
+  }, [location.state, toast])
 
   React.useEffect(() => {
     if (id) {
@@ -293,30 +339,29 @@ export function AuditSummary() {
             <CardDescription>Distribution of violations by impact level</CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col items-center justify-center">
-            <div className="h-[250px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={data.severityBreakdown}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={100}
-                    paddingAngle={2}
-                    dataKey="value"
-                    stroke="none"
-                  >
-                    {data.severityBreakdown.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.fill} />
-                    ))}
-                  </Pie>
-                  <RechartsTooltip
-                    contentStyle={{ borderRadius: "8px", border: "1px solid var(--color-border)" }}
-                    itemStyle={{ color: "var(--color-foreground)" }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
+            <ChartContainer config={severityConfig} className="h-[250px] w-full">
+              <PieChart>
+                <Pie
+                  data={data.severityBreakdown}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={100}
+                  paddingAngle={2}
+                  dataKey="value"
+                  nameKey="name"
+                  stroke="none"
+                >
+                  {data.severityBreakdown.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.fill} />
+                  ))}
+                </Pie>
+                <ChartTooltip
+                  cursor={false}
+                  content={<ChartTooltipContent hideLabel />}
+                />
+              </PieChart>
+            </ChartContainer>
             <div className="mt-4 flex flex-wrap items-center justify-center gap-4 text-sm font-medium">
               {data.severityBreakdown.map((item) => (
                 <div key={item.name} className="flex items-center gap-2">
@@ -397,31 +442,29 @@ export function AuditSummary() {
                 <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Minimum Score</span>
               </div>
             </div>
-            <div className="h-[200px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={data.lighthouseDistribution} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="var(--color-primary)" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="var(--color-primary)" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <XAxis dataKey="score" tickLine={false} axisLine={false} tick={{ fontSize: 12, fill: "var(--color-muted-foreground)" }} />
-                  <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 12, fill: "var(--color-muted-foreground)" }} />
-                  <RechartsTooltip
-                    contentStyle={{ borderRadius: "8px", border: "1px solid var(--color-border)" }}
-                    itemStyle={{ color: "var(--color-foreground)" }}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="count"
-                    stroke="var(--color-primary)"
-                    fillOpacity={1}
-                    fill="url(#colorScore)"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
+            <ChartContainer config={lighthouseConfig} className="h-[200px] w-full">
+              <AreaChart data={data.lighthouseDistribution} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="var(--color-primary)" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="var(--color-primary)" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <XAxis dataKey="score" tickLine={false} axisLine={false} tick={{ fontSize: 12, fill: "var(--color-muted-foreground)" }} />
+                <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 12, fill: "var(--color-muted-foreground)" }} />
+                <ChartTooltip
+                  cursor={false}
+                  content={<ChartTooltipContent indicator="dot" />}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="count"
+                  stroke="var(--color-primary)"
+                  fillOpacity={1}
+                  fill="url(#colorScore)"
+                />
+              </AreaChart>
+            </ChartContainer>
           </CardContent>
         </Card>
 

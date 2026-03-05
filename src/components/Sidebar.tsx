@@ -4,7 +4,6 @@ import {
   Shield,
   ScanSearch,
   History,
-  Settings,
   LayoutDashboard,
   AlertTriangle,
   Wrench,
@@ -178,14 +177,6 @@ export function Sidebar({ isCollapsed, setIsCollapsed, isMobile, onClose }: Side
             label="Documentation"
             isCollapsed={isCollapsed}
             isActive={location.pathname === "/docs"}
-            onClick={isMobile ? onClose : undefined}
-          />
-          <NavItem
-            to="/settings"
-            icon={Settings}
-            label="Settings"
-            isCollapsed={isCollapsed}
-            isActive={location.pathname === "/settings"}
             onClick={isMobile ? onClose : undefined}
           />
         </nav>

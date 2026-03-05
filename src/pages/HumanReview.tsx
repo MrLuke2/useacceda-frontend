@@ -296,7 +296,7 @@ export function HumanReview() {
   }
 
   return (
-    <div className="h-[calc(100vh-4rem)] flex flex-col">
+    <div className="h-full flex flex-col">
       <AnimatePresence mode="wait">
         {mode === "queue" ? (
           <motion.div 
@@ -435,18 +435,18 @@ export function HumanReview() {
                   <span className="font-medium">Back to Queue</span>
                 </Button>
                 <Separator orientation="vertical" className="h-8" />
-                <div className="flex flex-col">
-                  <div className="flex items-center gap-3">
-                    <span className="text-sm font-bold tracking-tight">{selectedFinding?.ruleId}</span>
-                    <Badge className={cn("text-[10px] font-bold uppercase tracking-wider px-2 py-0", SEVERITY_COLORS[selectedFinding?.severity || "Minor"])}>
-                      {selectedFinding?.severity}
-                    </Badge>
-                  </div>
-                  <div className="flex gap-1.5 mt-1">
+                <div className="flex items-center gap-4">
+                  <span className="text-sm font-bold font-mono tracking-tight text-primary/90">{selectedFinding?.ruleId}</span>
+                  <div className="flex gap-1.5 mt-0.5">
                     {selectedFinding?.wcag.map(c => (
-                      <span key={c} className="text-[10px] font-medium text-muted-foreground bg-muted px-1.5 py-0.5 rounded uppercase tracking-tighter">{c}</span>
+                      <span key={c} className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">
+                        WCAG {c}
+                      </span>
                     ))}
                   </div>
+                  <Badge className={cn("text-[10px] h-4.5 px-2 font-black uppercase tracking-wider", SEVERITY_COLORS[selectedFinding?.severity || "Minor"])}>
+                    {selectedFinding?.severity}
+                  </Badge>
                 </div>
               </div>
               

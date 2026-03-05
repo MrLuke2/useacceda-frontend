@@ -9,6 +9,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Slider } from "@/components/ui/slider"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useToast } from "@/components/ui/toast"
 import { AuditHistoryEntry } from "@/lib/mock-data"
 import { useAuditStore } from "@/store/useAuditStore"
@@ -208,7 +209,7 @@ export function NewAudit() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-start pt-32 pb-12 px-4">
+    <div className="flex flex-col items-center justify-start px-4">
       {/* Wizard Callout */}
       <div className="w-full max-w-2xl mb-6">
         <Link 
@@ -277,11 +278,16 @@ export function NewAudit() {
                       <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                         Scan Tier
                       </label>
-                      <select className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
-                        <option>Express (Sitemap only)</option>
-                        <option selected>Standard (Recursive depth 3)</option>
-                        <option>Deep Dive (Recursive depth 5)</option>
-                      </select>
+                      <Select defaultValue="standard">
+                        <SelectTrigger className="h-9">
+                          <SelectValue placeholder="Select tier" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="express">Express (Sitemap only)</SelectItem>
+                          <SelectItem value="standard">Standard (Recursive depth 3)</SelectItem>
+                          <SelectItem value="deep">Deep Dive (Recursive depth 5)</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                     <div className="space-y-2">
                       <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
